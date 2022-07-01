@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const Dishes = require('./models/dishes');
 
 const dbname = 'conFusion';
-const url = `mongodb+srv://conFusion:${DB_PASS}@confusion.lnvgz.mongodb.net/?retryWrites=true&w=majority`
+const url = `mongodb+srv://conFusion:${DB_PASS}@confusion.lnvgz.mongodb.net/${dbname}?retryWrites=true&w=majority`
 const connect = mongoose.connect(url);
 
 connect.then((db) => {
@@ -19,10 +19,26 @@ connect.then((db) => {
         .then((dish) => {
             console.log(dish);
 
-            return Dishes.find({});
+            return Dishes.findByIdAndUpdate(dish._id, {
+                $set: { description: 'Updated test' }
+            }, {
+                new: true
+            })
+                .exec();
         })
-        .then((dishes) => {
-            console.log(dishes);
+        .then((dish) => {
+            console.log(dish);
+
+            dish.comments.push({
+                rating: 5,
+                comment: 'I\'m getting a sinking feeling!',
+                author: 'Leonardo di Carpaccio'
+            });
+
+            return dish.save();
+        })
+        .then((dish) => {
+            console.log(dish);
 
             return Dishes.remove({});
         })
